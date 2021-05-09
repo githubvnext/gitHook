@@ -28,5 +28,5 @@ jobs:
       uses: azure/webapps-deploy@v1
       with: 
         app-name: githookvnext2393 # Replace with your app name
-        publish-profile: $webHookpublishProfile # Define secret variable in repository settings as per action documentation
+        publish-profile: ${{ secrets.webHookpublishProfile }} # Define secret variable in repository settings as per action documentation
         package: './webhookApi' 
