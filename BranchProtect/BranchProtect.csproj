@@ -17,6 +17,13 @@
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </None>
   </ItemGroup>
+
+ <ItemGroup>
+    <Content Update="local.settings.json" CopyToPublishDirectory="Never" />
+  </ItemGroup>
+
+
+
   <ItemGroup>
     <ProjectReference Include="..\GitHook.BusinessLayer\GitHook.BusinessLayer.csproj" />
     <ProjectReference Include="..\GitHook.Models\GitHook.Models.csproj" />
