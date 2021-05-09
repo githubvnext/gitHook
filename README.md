@@ -3,7 +3,7 @@ GitHook WebHook based on Asynchronous WebHook processing
 
 The Components are described as in below diagram
 
-![Process Flow](GitHubWebhookProcessFlow.png)
+![Process Flow](docs/GitHubWebhookProcessFlow.png)
 
 
 This Repository contains an Web Api based in C# ASP.NET Core Web Api templating. 
