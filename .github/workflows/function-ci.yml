@@ -23,10 +23,10 @@ jobs:
       run: dotnet build --no-restore
     - name: dotnet publish
       run: |
-        dotnet publish -c Release -o branchprotectFunc  GitHook.WebHook
+        dotnet publish -c Release -o branchprotectFunc  BranchProtect
     - name: 'Run Azure webapp deploy action using publish profile credentials'
       uses: azure/webapps-deploy@v1
       with: 
-        app-name: BranchProtect20210508201849 # Replace with your app name
+        app-name: $ {{  secrets.FUNCTIONAPPNAME}} # Replace with your app name
         publish-profile: ${{ secrets.FUNCTIONPUBLISHPROFILE }} # Define secret variable in repository settings as per action documentation
         package: './branchprotectFunc' 

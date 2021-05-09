@@ -27,6 +27,6 @@ jobs:
     - name: 'Run Azure webapp deploy action using publish profile credentials'
       uses: azure/webapps-deploy@v1
       with: 
-        app-name: githookvnext2393 # Replace with your app name
+        app-name: ${{ secrets.WEBHOOKAPPNAME}} # Replace with your app name
         publish-profile: ${{ secrets.WEBHOOKPUBLISHPROFILE }} # Define secret variable in repository settings as per action documentation
         package: './webhookApi' 
