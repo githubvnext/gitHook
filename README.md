@@ -76,7 +76,7 @@ The Complete Overview of the Processflow can be seen in [ProcessFlow](docs/Proce
 
 ---
 
-## **To Do (Next Steps)**
+## **Next Steps (Futurue Improvements)**
 1. Move all the App Configurations from App Service to Azure KeyVault
 2. Create Azure App Services through GitHub Actions.
 
