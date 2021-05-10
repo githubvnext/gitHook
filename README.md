@@ -26,17 +26,16 @@ There are 4 Visual Studio Projects which through which the objectives below are 
 ### **Projects in the repository**
 
 1.  **GitHook.Models** -  A generic common model _[PayloadInfo](src/GitHook.Models/PayloadInfo.cs)_ which is used for Seriliazing and Deserializing the payload between different components.
-2. **GitHook.BusinessLayer** - A C# Class Library that contains _[BranchProtection](src/GitHook.BusinessLayer/BranchProtection.cs)_ class to manage 2 objectives
-    - Call GitHub REST API below through _[Octokit.Net v 0.5.0](https://www.nuget.org/packages/Octokit/0.50.0)_
+2. **GitHook.BusinessLayer** - A C# Class Library that contains _[BranchProtection](src/GitHook.BusinessLayer/BranchProtection.cs)_ class to manage 2 below objectives. The Component Calls GitHub REST APIs below through _[Octokit.Net v 0.5.0](https://www.nuget.org/packages/Octokit/0.50.0)_
       - Protect the Branch (Under process as appropriate REST API to protect a branch directly from REST API couldn't be discovered using GitHub REST API Documentation)
-      - [Get Repository](https://docs.github.com/en/rest/reference/repos#get-a-repository)
-      - [Get Branch Protection](https://docs.github.com/en/rest/reference/repos#get-branch-protection)
-      - [Update Branch Protection](https://docs.github.com/en/rest/reference/repos#update-branch-protection)
-      - [Retrieve Teams](https://docs.github.com/en/rest/reference/teams#list-teams)
-      - [Add team access restrictions](https://docs.github.com/en/rest/reference/repos#add-team-access-restrictions)
-      - [Add user access restrictions](https://docs.github.com/en/rest/reference/repos#add-user-access-restrictions)
-      - [Add status check contexts](https://docs.github.com/en/rest/reference/repos#add-status-check-contexts)
-      - [Set admin branch protection](https://docs.github.com/en/rest/reference/repos#set-admin-branch-protection)
+        - [Get Repository](https://docs.github.com/en/rest/reference/repos#get-a-repository)
+        - [Get Branch Protection](https://docs.github.com/en/rest/reference/repos#get-branch-protection)
+        - [Update Branch Protection](https://docs.github.com/en/rest/reference/repos#update-branch-protection)
+        - [Retrieve Teams](https://docs.github.com/en/rest/reference/teams#list-teams)
+        - [Add team access restrictions](https://docs.github.com/en/rest/reference/repos#add-team-access-restrictions)
+        - [Add user access restrictions](https://docs.github.com/en/rest/reference/repos#add-user-access-restrictions)
+        - [Add status check contexts](https://docs.github.com/en/rest/reference/repos#add-status-check-contexts)
+        - [Set admin branch protection](https://docs.github.com/en/rest/reference/repos#set-admin-branch-protection)
     - [Create an Issue describing Branch Protection applied using @mention tag](https://docs.github.com/en/rest/reference/issues#create-an-issue)
 
 
