@@ -22,7 +22,8 @@ namespace GitHook.BusinessLayer
         {
             GitHubClient client = new GitHubClient(new ProductHeaderValue(GitHubAppName));
             client.Credentials = new Credentials(token);
-            _logger.LogInformation((await client.User.Get(payloadInfo.ownerName)).Followers.ToString() + " folks love " + payloadInfo.ownerName + "!");
+            var user= await client.User.Get(payloadInfo.ownerName);
+            _logger.LogInformation(user.Followers.ToString() + " folks love " + payloadInfo.ownerName + "!");
             _logger.LogInformation("Initialize a new instance of the SearchRepositoriesRequest class");
             SearchRepositoriesRequest search = new SearchRepositoriesRequest(payloadInfo.repoName);
             search.User = payloadInfo.orgName;
@@ -38,10 +39,10 @@ namespace GitHook.BusinessLayer
                     {
                         Repository repo = repository;
                         _logger.LogInformation("Get all the Branches in the Repository");
-                        IReadOnlyList<Branch> all = await client.Repository.Branch.GetAll(payloadInfo.orgName, repo.Name);
-                        if (all.Count > 0)
+                        IReadOnlyList<Branch> allBranches = await client.Repository.Branch.GetAll(payloadInfo.orgName, repo.Name);
+                        if (allBranches.Count > 0)
                         {
-                            foreach (Branch branch in (IEnumerable<Branch>)all)
+                            foreach (Branch branch in (IEnumerable<Branch>)allBranches)
                             {
                                 if (!branch.Protected)
                                 {
