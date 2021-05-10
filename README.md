@@ -72,3 +72,11 @@ The Complete Overview of the Processflow can be seen in [ProcessFlow](docs/Proce
 2. **Synchronous processing was a problem** - The solution was initially created using Synchronous call to GitHub REST API, however many times during the webhook processing, the Branch was actually not found through REST APIs. This was probably due to GitHub still in process of stabilizing the newly created Repository / Branch. The Solution was changed to Asynchronous processing mode by use of Azure Storage Queues.
 3. **PayloadProcessor DI** - The Dependency Injection technique was used to define the processing mechanism using AppSettings only.
 4. Usage of **ASP.NET Core 3.1 LTS** throughout - Azure Functions were failing to start / initialize / bind when ASP.NET Core 5.0 runtime was used, so whole solution was coded using ASP.NET Core 3.1 LTS which is very well supported by Azure Functions and Azure App Service both.
+
+
+---
+
+## **To DO**
+1. Move all the App Configurations from App Service to Azure KeyVault
+2. Create Azure App Services through GitHub Actions.
+
