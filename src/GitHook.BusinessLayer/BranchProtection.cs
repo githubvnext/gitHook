@@ -4,6 +4,7 @@ using Octokit;
 
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace GitHook.BusinessLayer
@@ -22,7 +23,7 @@ namespace GitHook.BusinessLayer
         {
             GitHubClient client = new GitHubClient(new ProductHeaderValue(GitHubAppName));
             client.Credentials = new Credentials(token);
-            var user= await client.User.Get(payloadInfo.ownerName);
+            var user = await client.User.Get(payloadInfo.ownerName);
             _logger.LogInformation(user.Followers.ToString() + " folks love " + payloadInfo.ownerName + "!");
             _logger.LogInformation("Initialize a new instance of the SearchRepositoriesRequest class");
             SearchRepositoriesRequest search = new SearchRepositoriesRequest(payloadInfo.repoName);
@@ -42,18 +43,18 @@ namespace GitHook.BusinessLayer
                         IReadOnlyList<Branch> allBranches = await client.Repository.Branch.GetAll(payloadInfo.orgName, repo.Name);
                         if (allBranches.Count > 0)
                         {
-                            foreach (Branch branch in (IEnumerable<Branch>)allBranches)
+                            foreach (Branch branch in allBranches)
                             {
                                 if (!branch.Protected)
                                 {
-                                    ProtectMasterBranch(client, repo, payloadInfo, teamName).GetAwaiter().GetResult();
-                                    CreateIssue(client, repo, payloadInfo);
+                                    var branchProtectionSettings = ProtectBranch(client, repo, payloadInfo, teamName).GetAwaiter().GetResult();
+                                    CreateIssue(client, repo, payloadInfo, branchProtectionSettings);
                                 }
                                 else if (branch.Protected)
                                 {
                                     BranchProtectionSettings branchProtection = await client.Repository.Branch.GetBranchProtection(repo.Id, branch.Name);
                                     _logger.LogInformation("Branch is already protected as below");
-                                    _logger.LogInformation(branchProtection.ToString());
+                                    _logger.LogInformation(branchProtection.GetString());
                                 }
                             }
                         }
@@ -72,49 +73,64 @@ namespace GitHook.BusinessLayer
             catch (Exception ex)
             {
                 _logger.LogError($"Error while applying branch protection settings {ex}");
-                client = null;
             }
         }
 
-        private async Task ProtectMasterBranch(
+        private async Task<BranchProtectionSettings> ProtectBranch(
           GitHubClient client,
           Repository repo,
           PayloadInfo payloadInfo,
           string teamName)
         {
-            IReadOnlyList<Team> teams = await client.Organization.Team.GetAll((await client.Organization.Get(payloadInfo.orgName)).Login);
-            List<Team> teamList1 = new List<Team>();
-            foreach (Team team in teams)
-            {
-                if (team.Name == teamName)
-                    teamList1.Add(team);
-            }
+
             try
             {
-                IReadOnlyList<Team> teamList2 = await client.Repository.Branch.AddProtectedBranchTeamRestrictions(repo.Id, payloadInfo.branchName, new BranchProtectionTeamCollection((IList<string>)new List<string>()
+                List<string> contexts = new List<string>();
+                //contexts.Add("contexts");
+                BranchProtectionRequiredStatusChecksUpdate requiredStatusChecks = new BranchProtectionRequiredStatusChecksUpdate(true, contexts);
+                BranchProtectionRequiredReviewsUpdate requiredPullRequestReviews = new BranchProtectionRequiredReviewsUpdate(true, true, 2);
+                BranchProtectionPushRestrictionsUpdate restrictions = new BranchProtectionPushRestrictionsUpdate();
+
+                IReadOnlyList<Team> teams = await client.Organization.Team.GetAll((await client.Organization.Get(payloadInfo.orgName)).Login);
+                //List<Team> teamList1 = new List<Team>();
+                foreach (Team team in teams)
                 {
-                  teamName
-                }));
-                IReadOnlyList<User> userList = await client.Repository.Branch.AddProtectedBranchUserRestrictions(repo.Id, payloadInfo.branchName, new BranchProtectionUserCollection((IList<string>)new List<string>()
-                {
-                    payloadInfo.ownerName
-                }));
-                IReadOnlyList<string> stringList = await client.Repository.Branch.AddRequiredStatusChecksContexts(payloadInfo.orgName, payloadInfo.orgName, payloadInfo.branchName, (IReadOnlyList<string>)new List<string>());
-                EnforceAdmins enforceAdmins = await client.Repository.Branch.AddAdminEnforcement(repo.Id, payloadInfo.branchName);
-                _logger.LogInformation((await client.Repository.Branch.GetBranchProtection(repo.Id, payloadInfo.branchName)).ToString());
+                    if (team.Name == teamName)
+                        restrictions.Teams.Add(team.Name);
+                }
+
+
+
+                bool enforceAdmins = true;
+
+
+                BranchProtectionSettingsUpdate settingsUpdate = new BranchProtectionSettingsUpdate(
+                    requiredStatusChecks,
+                    requiredPullRequestReviews,
+                    restrictions,
+                    enforceAdmins);
+                _logger.LogInformation("Calling UpdateBranchProtection");
+
+                await client.Repository.Branch.UpdateBranchProtection(repo.Id, payloadInfo.branchName, settingsUpdate);
+
+                _logger.LogInformation("Call to UpdateBranchProtection completed");
+                var branchProtectionSettings = await client.Repository.Branch.GetBranchProtection(repo.Id, payloadInfo.branchName);
+                _logger.LogInformation($"Get branchProtectionSettings Result:  {branchProtectionSettings.GetString()}");
+                return branchProtectionSettings;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error creating Branch Protection {ex}" );
+                _logger.LogError($"Error creating Branch Protection {ex}");
+                return null;
             }
         }
 
-        private void CreateIssue(GitHubClient client, Repository repo, PayloadInfo payloadInfo)
+        private void CreateIssue(GitHubClient client, Repository repo, PayloadInfo payloadInfo, BranchProtectionSettings branchProtectionSettings)
         {
             try
             {
-                NewIssue newIssue = new NewIssue(" Branch " + payloadInfo.branchName + " Protection settings Applied");
-                newIssue.Body = "The Branch Protection is applied by @" + payloadInfo.ownerName + "\r\n The Branch Protection settings can't be applied using REST API, there is no REST API to Create Branch Protection Settings through REST API, Octokit, Octokit.GraphSQL either";
+                NewIssue newIssue = new NewIssue($"{payloadInfo.branchName } Branch Protection settings Applied");
+                newIssue.Body = $"The Branch Protection is applied by @{payloadInfo.ownerName} as below: "  + branchProtectionSettings.GetString();
                 newIssue.Assignees.Add(payloadInfo.ownerName);
                 _logger.LogInformation("Creating Issue Now");
                 Issue result = client.Issue.Create(payloadInfo.orgName, repo.Name, newIssue).GetAwaiter().GetResult();
@@ -124,6 +140,48 @@ namespace GitHook.BusinessLayer
             {
                 _logger.LogError("Error creating the first issues " + ex.ToString());
             }
+        }
+    }
+    public static class BranchProtectionSettingsExtension
+    {
+        public static string GetString(this BranchProtectionSettings branchProtectionSettings)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append($"\r\nThe **Branch Protection settings** were applied using Octokit.Net through GitHub REST API as below:-");
+            sb.Append($"\r\n1. **Pull Request Restrictions**");
+            sb.Append($"\r\n    - Dismissal Restrictions = `Not Applicable`");
+            sb.Append($"\r\n    - Dismiss Stale Reviews = `{branchProtectionSettings.RequiredPullRequestReviews.DismissStaleReviews}`");
+            sb.Append($"\r\n    - Require Code Owner Reviews = `{branchProtectionSettings.RequiredPullRequestReviews.RequireCodeOwnerReviews}`");
+            sb.Append($"\r\n    - Required Approving Review Count = `{branchProtectionSettings.RequiredPullRequestReviews.RequiredApprovingReviewCount}`");
+
+            sb.Append($"\r\n\r\n2. **Required Status Checks Strict** = `{branchProtectionSettings.RequiredStatusChecks.Strict}`");
+            if (branchProtectionSettings.RequiredStatusChecks.Contexts.Count > 0)
+            {
+                sb.Append($"\r\n  - Required Status Checks Contexts : ");
+                int i = 1;
+                foreach (var context in branchProtectionSettings.RequiredStatusChecks.Contexts)
+                {
+                    sb.Append($"\r\n   {i++}. {context} ");
+                }
+            }
+            sb.Append($"\r\n\r\n");
+
+            if (branchProtectionSettings.Restrictions.Teams.Count > 0)
+            {
+                sb.Append($"\r\n  - Required Team Restrictions : ");
+                int i = 1;
+                foreach (var team in branchProtectionSettings.Restrictions.Teams)
+                {
+                    sb.Append($"\r\n   {i++}. {team} ");
+                }
+            }
+            sb.Append($"\r\n");
+            sb.Append($"\r\n3. EnforceAdmins = `{branchProtectionSettings.EnforceAdmins.Enabled}`");
+            sb.Append($"\r\n\r\n");
+            sb.Append($"\r\n\r\n");
+
+
+            return sb.ToString();
         }
     }
 }
