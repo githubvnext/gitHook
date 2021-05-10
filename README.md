@@ -24,7 +24,7 @@ The above Diagram is just indicative of the major components.
 
 This Repository contains an ASP.NET Core Web Api based WebHook with an Azure Function to process payload Asynchronously. The asynchronous processing is based on **[GitHub WebHook Integrations Best Practices recommendation](https://docs.github.com/en/rest/guides/best-practices-for-integrators#favor-asynchronous-work-over-synchronous)**
 
-There are 4 major Visual Studio Projects through which the objectives below are achieved. 
+There are 4 Visual Studio Projects through which the objectives below are achieved. 
 
 - Use Web API to get webhook Calls from GitHub installation
 - Web API queues the payload in Azure Storage Queues
@@ -37,19 +37,15 @@ There are 4 major Visual Studio Projects through which the objectives below are 
 
 1.  **GitHook.Models** -  A generic common model _[PayloadInfo](src/GitHook.Models/PayloadInfo.cs)_ which is used for Seriliazing and Deserializing the payload between different components.
 2. **GitHook.BusinessLayer** - A C# Class Library that contains _[BranchProtection](src/GitHook.BusinessLayer/BranchProtection.cs)_ class to manage 2 below objectives. The Component Calls GitHub REST APIs below through _[Octokit.Net v 0.5.0](https://www.nuget.org/packages/Octokit/0.50.0)_
-      - Protect the Branch (Under process as appropriate REST API to protect a branch directly from REST API couldn't be discovered using GitHub REST API Documentation)
+      - Protect the Branch through GitHub REST API: -
         - [Get Repository](https://docs.github.com/en/rest/reference/repos#get-a-repository)
         - [Get Branch Protection](https://docs.github.com/en/rest/reference/repos#get-branch-protection)
-        - [Update Branch Protection](https://docs.github.com/en/rest/reference/repos#update-branch-protection)
         - [Retrieve Teams](https://docs.github.com/en/rest/reference/teams#list-teams)
-        - [Add team access restrictions](https://docs.github.com/en/rest/reference/repos#add-team-access-restrictions)
-        - [Add user access restrictions](https://docs.github.com/en/rest/reference/repos#add-user-access-restrictions)
-        - [Add status check contexts](https://docs.github.com/en/rest/reference/repos#add-status-check-contexts)
-        - [Set admin branch protection](https://docs.github.com/en/rest/reference/repos#set-admin-branch-protection)
+        - [Update Branch Protection](https://docs.github.com/en/rest/reference/repos#update-branch-protection)
     - [Create an Issue describing Branch Protection applied using @mention tag](https://docs.github.com/en/rest/reference/issues#create-an-issue)
 
 
-3. **GitHook.WebHook** - A ASP.NET Core Web API (C#) Class Library that contains _GitHookController_ REST API Controller to Receive the Web Hook Calls from GitHub. The WebAPI project has capabilities to do Asynchronous and Synchronous Branch Protection function. 
+3. **GitHook.WebHook** - A ASP.NET Core Web API (C#) Class Library that contains _[GitHookController](src/GitHook.WebHook/Controllers/GitHookController.cs)_ REST API Controller to Receive the Web Hook Calls from GitHub. The WebAPI project has capabilities to do Asynchronous and Synchronous Branch Protection function. 
   The GitHook.WebHook project contains Dependency Injection based _[IPayloadProcessor](src/GitHook.WebHook/Processors/IPayloadProcessor.cs)_ which is set during Application _[Startup.cs](GitHook.WebHook/Startup.cs)_. If UseQueue is set, then _[QueueProcessor](src/GitHook.WebHook/Processors/QueueProcessor.cs)_ is used, else _[DirectProcessor](src/GitHook.WebHook/Processors/DirectProcessor.cs)_ is used. It is recommended to set "UseQueue" to true to achieve below objectives as per **[GitHub WebHook Integrations Best Practices recommendation](https://docs.github.com/en/rest/guides/best-practices-for-integrators#favor-asynchronous-work-over-synchronous)**
     - Be able to return the WebHook response to GitHub in 10 seconds.
     - Process the Payload Asynchronously using [BranchProtect Azure Function](src/BranchProtect)
