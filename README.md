@@ -60,7 +60,7 @@ There are 4 major Visual Studio Projects through which the objectives below are 
 
 4. **BranchProtect** - A C# based Azure Function which has QueueTrigger. The QueueConnection and QueueName are set in the local.settings.json which are also set into the Application Configurations on Azure FunctionApp on Azure. The BrantchProtect Azure Function App has QueueTrigger based Function _BranchProtectionFunc_ which does below tasks
     - Retrieve the Base64 Encoded PayloadInfo (QueueTrigger based Functions receive Base64 encoded Messages as per [Official Azure Function Doc](https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-storage-queue-trigger?tabs=csharp#encoding))
-    - Deserialize into `PayloadInfo` Object [Newtonsoft.Json v 13.0.1](https://www.nuget.org/packages/Newtonsoft.Json/13.0.1)
+    - Deserialize into `PayloadInfo` Object using _[Newtonsoft.Json v 13.0.1](https://www.nuget.org/packages/Newtonsoft.Json/13.0.1)_
     - Call `ProtectRepo` function in [GitHook.BusinessLayer.BranchProtection](src/GitHook.BusinessLayer/BranchProtection.cs)
 
 The Complete Overview of the Processflow can be seen in [ProcessFlow](docs/ProcessFlow.md)
