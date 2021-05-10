@@ -1,22 +1,28 @@
 ## **GitHub Web Hook**
 GitHook WebHook based on Asynchronous WebHook processing
 
+
+---
+
 GitHub Actions Status 
 
-[![FunctionDeploy](https://github.com/githubvnext/gitHook/actions/workflows/function-ci.yml/badge.svg)](https://github.com/githubvnext/gitHook/actions/workflows/function-ci.yml)
+Web Hook CI | BranchProtect Function
+------------ | -------------
+[![WebHookDeploy](https://github.com/githubvnext/gitHook/actions/workflows/webhook-ci.yml/badge.svg)](https://github.com/githubvnext/gitHook/actions/workflows/webhook-ci.yml) | [![FunctionDeploy](https://github.com/githubvnext/gitHook/actions/workflows/function-ci.yml/badge.svg)](https://github.com/githubvnext/gitHook/actions/workflows/function-ci.yml) 
 
-[![WebHookDeploy](https://github.com/githubvnext/gitHook/actions/workflows/webhook-ci.yml/badge.svg)](https://github.com/githubvnext/gitHook/actions/workflows/webhook-ci.yml)
-
-
-This Repository contains an ASP.NET Core Web Api based WebHook with an Azure Function to process payload Asynchronously. The asynchronous processing is based on **[GitHub WebHook Integrations Best Practices recommendation](https://docs.github.com/en/rest/guides/best-practices-for-integrators#favor-asynchronous-work-over-synchronous)**
-
-
-### _______________________________________________________________________________________________________________
+---
 
 The Components are described as in below diagram
 
 ![Process Flow](docs/GitHubWebhookProcessFlow.png)
 
+The above Diagram is just indicative of the major components.
+
+---
+
+### **Components Definition**
+
+This Repository contains an ASP.NET Core Web Api based WebHook with an Azure Function to process payload Asynchronously. The asynchronous processing is based on **[GitHub WebHook Integrations Best Practices recommendation](https://docs.github.com/en/rest/guides/best-practices-for-integrators#favor-asynchronous-work-over-synchronous)**
 
 There are 4 major Visual Studio Projects through which the objectives below are achieved. 
 
@@ -24,6 +30,8 @@ There are 4 major Visual Studio Projects through which the objectives below are 
 - Web API queues the payload in Azure Storage Queues
 - Azure Functions (Queue Trigger) processes the GitHub WebHook payloads
 - Use GitHub Powerful API to Protect Master / main branches
+
+---
 
 ### **Projects in the repository**
 
@@ -57,8 +65,7 @@ There are 4 major Visual Studio Projects through which the objectives below are 
 
 The Complete Overview of the Processflow can be seen in [ProcessFlow](docs/ProcessFlow.md)
 
-
-### _______________________________________________________________________________________________________________
+---
 
 ## **Issues Experienced**
 1. The **default_branch** name sent in the Webhook calls from Github sometimes contains master and other times main. The Solution needed to be adjusted to pick the branches which exist in the repository and then take action on the existing branch rather than spurious / non-existing branch.
