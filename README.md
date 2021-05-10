@@ -11,12 +11,14 @@ GitHub Actions Status
 This Repository contains an ASP.NET Core Web Api based WebHook with an Azure Function to process payload Asynchronously. The asynchronous processing is based on **[GitHub WebHook Integrations Best Practices recommendation](https://docs.github.com/en/rest/guides/best-practices-for-integrators#favor-asynchronous-work-over-synchronous)**
 
 
+### _______________________________________________________________________________________________________________
+
 The Components are described as in below diagram
 
 ![Process Flow](docs/GitHubWebhookProcessFlow.png)
 
 
-There are 4 Visual Studio Projects which through which the objectives below are achieved. 
+There are 4 major Visual Studio Projects through which the objectives below are achieved. 
 
 - Use Web API to get webhook Calls from GitHub installation
 - Web API queues the payload in Azure Storage Queues
@@ -54,3 +56,12 @@ There are 4 Visual Studio Projects which through which the objectives below are 
     - Call `ProtectRepo` function in [GitHook.BusinessLayer.BranchProtection](src/GitHook.BusinessLayer/BranchProtection.cs)
 
 The Complete Overview of the Processflow can be seen in [ProcessFlow](docs/ProcessFlow.md)
+
+
+### _______________________________________________________________________________________________________________
+
+## **Issues Experienced**
+1. The **default_branch** name sent in the Webhook calls from Github sometimes contains master and other times main. The Solution needed to be adjusted to pick the branches which exist in the repository and then take action on the existing branch rather than spurious / non-existing branch.
+2. **Synchronous processing was a problem** - The solution was initially created using Synchronous call to GitHub REST API, however many times during the webhook processing, the Branch was actually not found through REST APIs. This was probably due to GitHub still in process of stabilizing the newly created Repository / Branch. The Solution was changed to Asynchronous processing mode by use of Azure Storage Queues.
+3. **PayloadProcessor DI** - The Dependency Injection technique was used to define the processing mechanism using AppSettings only.
+4. Usage of **ASP.NET Core 3.1 LTS** throughout - Azure Functions were failing to start / initialize / bind when ASP.NET Core 5.0 runtime was used, so whole solution was coded using ASP.NET Core 3.1 LTS which is very well supported by Azure Functions and Azure App Service both.
