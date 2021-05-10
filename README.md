@@ -29,7 +29,7 @@ There are 4 Visual Studio Projects through which the objectives below are achiev
 - Use Web API to get webhook Calls from GitHub installation
 - Web API queues the payload in Azure Storage Queues
 - Azure Functions (Queue Trigger) processes the GitHub WebHook payloads
-- Use GitHub Powerful API to Protect Master / main branches
+- Use GitHub REST API to Protect Master / main branches
 
 ---
 
