@@ -23,7 +23,7 @@ jobs:
       run: dotnet build --no-restore
     - name: dotnet publish
       run: |
-        dotnet publish -c Release -o branchprotectFunc  BranchProtect
+        dotnet publish -c Release -o branchprotectFunc  src/BranchProtect
     - name: 'Run Azure webapp deploy action using publish profile credentials'
       uses: azure/webapps-deploy@v1
       with: 
