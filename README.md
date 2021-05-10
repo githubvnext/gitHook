@@ -18,10 +18,10 @@ The Components are described as in below diagram
 
 There are 4 Visual Studio Projects which through which the objectives below are achieved. 
 
-- Use GitHub Powerful API to Protect Master / main branches
 - Use Web API to get webhook Calls from GitHub installation
 - Web API queues the payload in Azure Storage Queues
 - Azure Functions (Queue Trigger) processes the GitHub WebHook payloads
+- Use GitHub Powerful API to Protect Master / main branches
 
 ### **Projects in the repository**
 
