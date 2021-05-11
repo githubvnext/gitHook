@@ -1,4 +1,5 @@
-﻿using GitHook.Models;
+﻿using GitHook.BusinessLayer;
+using GitHook.Models;
 using GitHook.Webhook.Processors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -21,15 +22,17 @@ namespace GitHook.WebHook.Controllers
         private readonly ILogger<GitHookController> _logger;
         private readonly IConfiguration _configuration;
         private readonly IPayloadProcessor _payloadProcessor;
-
+        private readonly PayloadParser _payloadParser;
         public GitHookController(
           ILogger<GitHookController> logger,
           IConfiguration configuration,
-          IPayloadProcessor payloadProcessor)
+          IPayloadProcessor payloadProcessor,
+          PayloadParser payloadParser)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _payloadProcessor = payloadProcessor ?? throw new ArgumentNullException(nameof(payloadProcessor));
+            _payloadParser = payloadParser ?? throw new ArgumentNullException(nameof(payloadParser));
         }
 
         [HttpPost("")]
@@ -48,14 +51,14 @@ namespace GitHook.WebHook.Controllers
             }
             using (StreamReader reader = new StreamReader(Request.Body))
             {
-                string endAsync = await reader.ReadToEndAsync();
-                _logger.LogDebug(endAsync);
+                string payloadJson = await reader.ReadToEndAsync();
+                _logger.LogDebug(payloadJson);
                  
                 Request.Headers.TryGetValue("X-Hub-Signature", out StringValues signature);
-                if (IsGithubPushAllowed(endAsync, eventName, signature, userAgent))
+                if (IsGithubPushAllowed(payloadJson, eventName, signature, userAgent))
                 {
                     _logger.LogInformation("GitHub Push HMAC is OK");
-                    PayloadInfo payloadInfo = getPayloadInfo(endAsync);
+                    PayloadInfo payloadInfo = _payloadParser.TexttoPayloadInfo(payloadJson);
                     if (payloadInfo.Created)
                     {
                         _logger.LogInformation("Calling to Protect Repo " + payloadInfo.repoName);
@@ -75,22 +78,22 @@ namespace GitHook.WebHook.Controllers
             }
         }
 
-        private static PayloadInfo getPayloadInfo(string txt)
-        {
-            JObject payloadJObject = JObject.Parse(txt);
-            return new PayloadInfo()
-            {
-                orgName = payloadJObject["organization"]["login"].ToString(),
-                orgId = long.Parse(payloadJObject["organization"]["id"].ToString()),
-                repoName = payloadJObject["repository"]["name"].ToString(),
-                repoId = long.Parse(payloadJObject["repository"]["id"].ToString()),
-                branchName = payloadJObject["repository"]["default_branch"].ToString(),
-                openIssuesCount = int.Parse(payloadJObject["repository"]["open_issues"].ToString()),
-                CreatedAt = DateTime.Parse(payloadJObject["repository"]["created_at"].ToString()),
-                Created = payloadJObject["action"].ToString() == "created",
-                ownerName = payloadJObject["sender"]["login"].ToString()
-            };
-        }
+        //private static PayloadInfo getPayloadInfo(string txt)
+        //{
+        //    JObject payloadJObject = JObject.Parse(txt);
+        //    return new PayloadInfo()
+        //    {
+        //        orgName = payloadJObject["organization"]["login"].ToString(),
+        //        orgId = long.Parse(payloadJObject["organization"]["id"].ToString()),
+        //        repoName = payloadJObject["repository"]["name"].ToString(),
+        //        repoId = long.Parse(payloadJObject["repository"]["id"].ToString()),
+        //        branchName = payloadJObject["repository"]["default_branch"].ToString(),
+        //        openIssuesCount = int.Parse(payloadJObject["repository"]["open_issues"].ToString()),
+        //        CreatedAt = DateTime.Parse(payloadJObject["repository"]["created_at"].ToString()),
+        //        Created = payloadJObject["action"].ToString() == "created",
+        //        ownerName = payloadJObject["sender"]["login"].ToString()
+        //    };
+        //}
 
         private bool IsGithubPushAllowed(
           string payload,

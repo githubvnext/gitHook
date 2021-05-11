@@ -1,3 +1,4 @@
+using GitHook.BusinessLayer;
 using GitHook.Webhook.Processors;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -28,6 +29,9 @@ namespace GitHook.WebHook
                 services.AddTransient<IPayloadProcessor, QueueProcessor>();
             else
                 services.AddTransient<IPayloadProcessor, DirectProcessor>();
+
+
+            services.AddTransient<PayloadParser, PayloadParser>();
             services.AddControllers();
 
             services.AddSwaggerGen(c =>

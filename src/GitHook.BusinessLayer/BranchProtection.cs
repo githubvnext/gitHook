@@ -36,9 +36,9 @@ namespace GitHook.BusinessLayer
                 if (repositoryResult.TotalCount >= 0)
                 {
                     _logger.LogInformation("found the repository(s)");
-                    foreach (Repository repository in repositoryResult.Items)
+                    foreach (Octokit.Repository repository in repositoryResult.Items)
                     {
-                        Repository repo = repository;
+                        Octokit.Repository repo = repository;
                         _logger.LogInformation("Get all the Branches in the Repository");
                         IReadOnlyList<Branch> allBranches = await client.Repository.Branch.GetAll(payloadInfo.orgName, repo.Name);
                         if (allBranches.Count > 0)
@@ -78,7 +78,7 @@ namespace GitHook.BusinessLayer
 
         private async Task<BranchProtectionSettings> ProtectBranch(
           GitHubClient client,
-          Repository repo,
+          Octokit.Repository repo,
           PayloadInfo payloadInfo,
           string teamName)
         {
@@ -125,7 +125,7 @@ namespace GitHook.BusinessLayer
             }
         }
 
-        private void CreateIssue(GitHubClient client, Repository repo, PayloadInfo payloadInfo, BranchProtectionSettings branchProtectionSettings)
+        private void CreateIssue(GitHubClient client, Octokit.Repository repo, PayloadInfo payloadInfo, BranchProtectionSettings branchProtectionSettings)
         {
             try
             {
