@@ -78,23 +78,6 @@ namespace GitHook.WebHook.Controllers
             }
         }
 
-        //private static PayloadInfo getPayloadInfo(string txt)
-        //{
-        //    JObject payloadJObject = JObject.Parse(txt);
-        //    return new PayloadInfo()
-        //    {
-        //        orgName = payloadJObject["organization"]["login"].ToString(),
-        //        orgId = long.Parse(payloadJObject["organization"]["id"].ToString()),
-        //        repoName = payloadJObject["repository"]["name"].ToString(),
-        //        repoId = long.Parse(payloadJObject["repository"]["id"].ToString()),
-        //        branchName = payloadJObject["repository"]["default_branch"].ToString(),
-        //        openIssuesCount = int.Parse(payloadJObject["repository"]["open_issues"].ToString()),
-        //        CreatedAt = DateTime.Parse(payloadJObject["repository"]["created_at"].ToString()),
-        //        Created = payloadJObject["action"].ToString() == "created",
-        //        ownerName = payloadJObject["sender"]["login"].ToString()
-        //    };
-        //}
-
         private bool IsGithubPushAllowed(
           string payload,
           string eventName,

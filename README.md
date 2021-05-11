@@ -35,22 +35,30 @@ There are 4 Visual Studio Projects through which the objectives below are achiev
 
 ### **Projects in the repository**
 
-1.  **[GitHook.Models](src/GitHook.Models)** -  A generic common model _[PayloadInfo](src/GitHook.Models/PayloadInfo.cs)_ which is used for Seriliazing and Deserializing the payload between different components.
-2. **[GitHook.BusinessLayer](src/GitHook.BusinessLayer)** - A C# Class Library that contains _[BranchProtection](src/GitHook.BusinessLayer/BranchProtection.cs)_ class to manage 2 below objectives. The Component Calls GitHub REST APIs below through _[Octokit.Net v 0.5.0](https://www.nuget.org/packages/Octokit/0.50.0)_
+1.  **[GitHook.Models](src/GitHook.Models)** -  Contains common model definitions that are used throughout in other Projects.
+  - _[GitHubPayload](src/GitHook.Models/GitHubPayload.cs)_ typed format of GitHub Webhook Payload JSON.
+  - _[PayloadInfo](src/GitHook.Models/PayloadInfo.cs)_ which is used for Seriliazing and Deserializing the payload between different components.
+
+2. **[GitHook.BusinessLayer](src/GitHook.BusinessLayer)** - A C# Class Library that contains 2 Classes which help in Parsing the payload and running Branch Protection Logics. 
+
+    a. **[BranchProtection](src/GitHook.BusinessLayer/BranchProtection.cs)** - achieves 2 below objectives. The Component Calls GitHub REST APIs below through _[Octokit.Net v 0.5.0](https://www.nuget.org/packages/Octokit/0.50.0)_
       - Protect the Branch through GitHub REST API: -
         - [Get Repository](https://docs.github.com/en/rest/reference/repos#get-a-repository)
         - [Get Branch Protection](https://docs.github.com/en/rest/reference/repos#get-branch-protection)
         - [Retrieve Teams](https://docs.github.com/en/rest/reference/teams#list-teams)
         - [Update Branch Protection](https://docs.github.com/en/rest/reference/repos#update-branch-protection)
-    - [Create an Issue describing Branch Protection applied using @mention tag](https://docs.github.com/en/rest/reference/issues#create-an-issue)
+      - [Create an Issue describing Branch Protection applied using @mention tag](https://docs.github.com/en/rest/reference/issues#create-an-issue)
 
+    b. **[PayloadParser](src/GitHook.BusinessLayer/PayloadParser.cs)** - This is used in WebHook Project for achieving below objectives 
+      - Parse the incoming GitHub WebHook Payload JSON into Typed Payload [GitHubPayload](src/GitHook.Models/GitHubPayload.cs)
+      - Cherry Picks the properties from GitHubPayload to fetch [PayloadInfo](src/GitHook.Models/PayloadInfo.cs)
 
 3. **[GitHook.WebHook](src/GitHook.WebHook)** - A ASP.NET Core Web API (C#) Class Library that contains _[GitHookController](src/GitHook.WebHook/Controllers/GitHookController.cs)_ REST API Controller to Receive the Web Hook Calls from GitHub. The WebAPI project has capabilities to do Asynchronous and Synchronous Branch Protection function. 
   The GitHook.WebHook project contains Dependency Injection based _[IPayloadProcessor](src/GitHook.WebHook/Processors/IPayloadProcessor.cs)_ which is set during Application _[Startup.cs](GitHook.WebHook/Startup.cs)_. If UseQueue is set, then _[QueueProcessor](src/GitHook.WebHook/Processors/QueueProcessor.cs)_ is used, else _[DirectProcessor](src/GitHook.WebHook/Processors/DirectProcessor.cs)_ is used. It is recommended to set "UseQueue" to true to achieve below objectives as per **[GitHub WebHook Integrations Best Practices recommendation](https://docs.github.com/en/rest/guides/best-practices-for-integrators#favor-asynchronous-work-over-synchronous)**
     - Be able to return the WebHook response to GitHub in 10 seconds.
     - Process the Payload Asynchronously using [BranchProtect Azure Function](src/BranchProtect)
 
-    When `**AppSetting:UseQueue**` is set to true, then the below 2 attributes need to be set mandatorily
+    When `AppSetting:UseQueue` is set to true, then the below 2 attributes need to be set mandatorily
       - QueueConnection - Full Connection String to a Storage Queue
       - QueueName - Queue Name which would be used by the Asynchronous processor.
 
@@ -68,7 +76,7 @@ The Complete Overview of the Processflow can be seen in [ProcessFlow](docs/Proce
 2. **Synchronous processing was a problem** - The solution was initially created using Synchronous call to GitHub REST API, however many times during the webhook processing, the Branch was actually not found through REST APIs. This was probably due to GitHub still in process of stabilizing the newly created Repository / Branch. The Solution was changed to Asynchronous processing mode by use of Azure Storage Queues.
 3. **PayloadProcessor DI** - The Dependency Injection technique was used to define the processing mechanism using AppSettings only.
 4. Usage of **ASP.NET Core 3.1 LTS** throughout - Azure Functions were failing to start / initialize / bind when ASP.NET Core 5.0 runtime was used, so whole solution was coded using ASP.NET Core 3.1 LTS which is very well supported by Azure Functions and Azure App Service both.
-
+5. Typed Payload Object **GitHubPayload.cs** was created to Parse the GitHub Wehook JSON.
 
 ---
 
