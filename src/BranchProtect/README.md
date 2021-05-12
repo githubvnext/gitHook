@@ -15,3 +15,13 @@
 ````
 
 The above settings are required to be set in local.settings.json in case you are running the BranchProtect Azure Function locally
+
+Finally once the branch Protection Settings are applied, the below are few snapshots which indicate how the Protection Settings and Issues appear on the newly created Repository.
+
+- Branch Protection Settings Applied
+
+![Branch Protection Settings Applied](../../docs/BranchProtectionApplied.png)
+
+- Issue Raised in the Repository
+
+![Issue Raised](../../docs/IssueRaised.png)
