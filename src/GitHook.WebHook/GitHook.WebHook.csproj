@@ -25,10 +25,18 @@
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Content>
   </ItemGroup> -->
+  <ItemGroup>
+     <None Update="AppSettings_Configuration.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </None>
+  </ItemGroup>
+
 
   <ItemGroup>
     <Content Update="appsettings.*.json" CopyToPublishDirectory="Never" />
     <Content Update="appsettings.$(MSBuildThisFileName).json" CopyToPublishDirectory="PreserveNewest" />
+    <Content Update="AppSettings_Configuration.json" CopyToPublishDirectory="Never" />
   </ItemGroup>
 
 </Project>

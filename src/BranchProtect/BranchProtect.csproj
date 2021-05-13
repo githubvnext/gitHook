@@ -16,10 +16,15 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </None>
+     <None Update="AppSettings_Configuration.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </None>
   </ItemGroup>
 
  <ItemGroup>
     <Content Update="local.settings.json" CopyToPublishDirectory="Never" />
+    <Content Update="AppSettings_Configuration.json" CopyToPublishDirectory="Never" />
   </ItemGroup>
 
 

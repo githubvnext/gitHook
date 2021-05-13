@@ -58,7 +58,7 @@ There are 4 Visual Studio Projects through which the objectives below are achiev
     - Be able to return the WebHook response to GitHub in 10 seconds.
     - Process the Payload Asynchronously using [BranchProtect Azure Function](src/BranchProtect)
 
-    When `AppSetting:UseQueue` is set to true, then the below 2 attributes need to be set mandatorily
+    Full Description on the App Settings can be found in Individual [README.md for WebHook project](src/GitBook.WebHook/README.md). When `AppSetting:UseQueue` is set to true, then the below 2 attributes need to be set mandatorily
       - QueueConnection - Full Connection String to a Storage Queue
       - QueueName - Queue Name which would be used by the Asynchronous processor.
 
@@ -77,10 +77,9 @@ The Complete Overview of the Processflow can be seen in [ProcessFlow](docs/Proce
 3. **PayloadProcessor DI** - The Dependency Injection technique was used to define the processing mechanism using AppSettings only.
 4. Usage of **ASP.NET Core 3.1 LTS** throughout - Azure Functions were failing to start / initialize / bind when ASP.NET Core 5.0 runtime was used, so whole solution was coded using ASP.NET Core 3.1 LTS which is very well supported by Azure Functions and Azure App Service both.
 5. Typed Payload Object **GitHubPayload.cs** was created to Parse the GitHub Wehook JSON.
-
+6. Move all the App Configurations from App Service to Azure KeyVault. Relevant README.md for [BranchProtect](src/BranchProtect/README.md) and [WebHook](src/GitHook.WebHook/README.md) have been updated. The Issue [#1 - Move all the App Configurations from App Service to Azure KeyVault](/../../issues/1) has also been closed.
 ---
 
 ## **Next Steps (Future Improvements)**
-1. Move all the App Configurations from App Service to Azure KeyVault
-2. Create Azure App Services through GitHub Actions.
+[#2](/../../issues/2). Create Azure App Services through GitHub Actions.
 
